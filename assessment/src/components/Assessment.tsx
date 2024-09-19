@@ -1,62 +1,51 @@
+
+
 import { Button } from "@chakra-ui/react"
 import axios from "axios"
 import { useEffect, useState } from "react"
 
-interface todos{
-    id:number
-    title:string
+interface Todo {
+  id: number
+  title: string
 }
 
-
 const Assessment = () => {
-const [tasks, setTasks] = useState<todos[]>([])
+  const [tasks, setTasks] = useState<Todo[]>([])
 
+  const fetchData = () => {
+    axios.get('https://jsonplaceholder.typicode.com/todos')
+      .then((response) => setTasks(response.data))
+  }
 
-    const FetchData = () => {
-        axios.get(' https://jsonplaceholder.typicode.com/todos')
-        .then((response) => setTasks(response.data))
-    }
+  useEffect(() => {
+    fetchData();
+  }, [])
 
-    useEffect(() => {
-        FetchData();
-        
-      
-    }, [])
+  const addUser = () => {
+    const newTask: Todo = { id: Date.now(), title: 'What shall I do next?' }
+    setTasks([newTask, ...tasks])
+    axios.post('https://jsonplaceholder.typicode.com/todos', newTask)
+      .then(response => setTasks([response.data, ...tasks]))
+  }
 
-    const addUser = () => {
-        const newTask = {id: 0, title: 'What shall i do next?'}
-        setTasks([newTask, ...tasks])
-        axios.post('https://jsonplaceholder.typicode.com/todos', newTask)
-        .then(response => setTasks([response.data, ...tasks]))
-    }
-
-    // const updateUser = (title:todos) => {
-
-    //     const updatedUser = {...tasks, title: title  + 'Finished'}
-    //     setTasks(tasks.map((u) => (u.id === tasks.id ? updatedUser : u)))
-    // }
-
-    const deleteUser = (tasks: todos) => {
-        setTasks(tasks.filter(u => u.id !== tasks.id))
-        axios.delete('https://jsonplaceholder.typicode.com/todos' )
-    }
-
-    
-
+  const deleteUser = (taskToDelete: Todo) => {
+    setTasks(tasks.filter(task => task.id !== taskToDelete.id))
+    axios.delete(`https://jsonplaceholder.typicode.com/todos/${taskToDelete.id}`)
+  }
 
   return (
-   <>   
-   <h1>
-    <ul>
-    <button className="btn btn-primary mx-3 mb-3" onClick={addUser}>Add</button>
-        {tasks.map(task => (<li key={task.id}>{task.title}</li>))}
-        <div>
-   
-        </div>
-    </ul>
-   </h1>
-        
-   </>
+    <>
+      <h1>Todo List</h1>
+      <Button onClick={addUser}>Add</Button>
+      <ul>
+        {tasks.map(task => (
+          <li key={task.id}>
+            {task.title}
+            <Button onClick={() => deleteUser(task)}>Delete</Button>
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }
 

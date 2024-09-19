@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 
 const Counter = () => {
@@ -7,6 +7,13 @@ const Counter = () => {
         setCounter(prevCount => prevCount + 1)
 
      }
+
+     useEffect(() => {
+       document.title = `Count ${counter}`;
+     handleIncreament();
+         downIncreament();
+     }, [counter])
+     
 
 
      const downIncreament = () => {
